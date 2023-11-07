@@ -1,0 +1,72 @@
+import React, { useState } from 'react';
+import './ImageGallery.css';
+
+const ImageGallery = ({ images, setImages }) => {
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+
+  const toggleImageSelection = (image) => {
+    const imageIndex = selectedImages.findIndex((selectedImage) => selectedImage.id === image.id);
+
+    if (imageIndex === -1) {
+      // Image is not selected, add it to the selection
+      setSelectedImages([...selectedImages, image]);
+    } else {
+      // Image is selected, remove it from the selection
+      const updatedSelection = [...selectedImages];
+      updatedSelection.splice(imageIndex, 1);
+      setSelectedImages(updatedSelection);
+    }
+  };
+
+
+  const deleteSelectedImages = () => {
+     console.log('Delete function called'); 
+    // Filter out the selected images from the images list
+    const updatedImages = images.filter((image) => !selectedImages.some((selectedImage) => selectedImage.id === image.id));
+    console.log('Updated images:', updatedImages);
+
+    setSelectedImages([]);
+    setIsDeleteMode(false);
+
+    setImages(updatedImages);
+
+  };
+
+  return (
+    <div>
+      <div className="image-gallery">
+        {images.map((image) => (
+          <div key={image.id} className={`image-item ${image.isFeatured ? 'featured' : ''} ${selectedImages.some((selectedImage) => selectedImage.id === image.id) ? 'selected' : ''}`}>
+            <div className={selectedImages.some((selectedImage)=> selectedImage.id === image.id)?"show-overlay":"image-overlay"}>
+              <input
+                type="checkbox"
+                checked={selectedImages.some((selectedImage) => selectedImage.id === image.id)}
+                onChange={() => toggleImageSelection(image)}
+                className="checkbox"
+              />
+            </div>
+            <img
+              src={`/images/${image.ImageName}`}
+              alt={`Image ${image.id}`}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="controls">
+        <button
+          onClick={() => setIsDeleteMode(!isDeleteMode)}
+          className={`delete-button ${isDeleteMode ? 'active' : ''}`}>
+          Delete
+        </button>
+        {isDeleteMode && (
+          <button onClick={deleteSelectedImages} className="confirm-delete-button">
+            Confirm Delete
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ImageGallery;
